@@ -8,18 +8,25 @@ class Puppet:
         self.room = 4
         self.create_rout()
         self.is_attacking = False
+        self.left_door = None
+        self.right_door = None
 
     def create_rout(self):
         self.rout = random.choice(Puppet.routs)
+        print(self.rout)
         self.rout_stage = 0
 
     def change_room(self):
-        if self.rout:
-            self.rout_stage += 1
-            self.room = self.rout[self.rout_stage]
-        else:
-            if self.room == 0:
+        print(self.room)
+        print(self.is_attacking)
+        self.rout_stage += 1
+        self.room = self.rout[self.rout_stage]
+        if self.room == 0:
+            if self.check_is_closed(self.left_door):
                 self.is_attacking = True
-            if self.room == 10:
+        if self.room == 10:
+            if self.check_is_closed(self.right_door):
                 self.is_attacking = True
-            self.rout_stage = 0
+
+    def check_is_closed(self, door):
+        return True

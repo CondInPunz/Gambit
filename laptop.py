@@ -50,7 +50,6 @@ class Laptop(pygame.sprite.Sprite):
             self.is_caught = True
         else:
             self.is_caught = False
-        print(self.is_caught)
 
     def update(self, *args):
         if args and args[0].type == pygame.MOUSEBUTTONDOWN and \

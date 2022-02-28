@@ -12,7 +12,7 @@ LOAD_GAME = 1
 GAME_MODE = 2
 GAME_OVER = 3
 
-if __name__ == '__main__':
+def main():
     pygame.init()
     pygame.display.set_caption('FNAP')
     size = SCR_WIDTH, SCR_HEIGHT
@@ -46,6 +46,18 @@ if __name__ == '__main__':
 
     first_night_image = controls.load_image_fnap("1st_night.BMP")
     first_night_image = pygame.transform.scale(first_night_image, (720, 540))
+
+    second_night_image = controls.load_image_fnap("2st_night.BMP")
+    second_night_image = pygame.transform.scale(second_night_image, (720, 540))
+
+    third_night_image = controls.load_image_fnap("3st_night.BMP")
+    third_night_image = pygame.transform.scale(third_night_image, (720, 540))
+
+    fourth_night_image = controls.load_image_fnap("4st_night.BMP")
+    fourth_night_image = pygame.transform.scale(fourth_night_image, (720, 540))
+
+    fifth_night_image = controls.load_image_fnap("5st_night.BMP")
+    fifth_night_image = pygame.transform.scale(fifth_night_image, (720, 540))
 
     game_over_image = controls.load_image_fnap("GAME_OVER.BMP")
     game_over_image = pygame.transform.scale(game_over_image, (720, 540))
@@ -82,10 +94,14 @@ if __name__ == '__main__':
     closed_laptop_img = controls.load_image_fnap("panel.BMP")
     closed_laptop_img = pygame.transform.scale(closed_laptop_img, (500, 200))
 
+    jumpscare_img = controls.load_image_fnap("jumpscare.BMP")
+    jumpscare_img = pygame.transform.scale(jumpscare_img, (1, 1))
+
     '''ивенты загрузки'''
     LOADEVENTTYPE = pygame.USEREVENT + 1
     load_game_count_started = False
     is_first_menu_load = True
+    is_first_lost_game = True
 
     '''логика игры'''
     is_first_run = True
@@ -124,21 +140,35 @@ if __name__ == '__main__':
                     if first_night_btn.update(event):
                         game_state = LOAD_GAME
                         difficulty_lvl = 1
+                        is_first_menu_load = True
                     if second_night_btn.update(event):
                         game_state = LOAD_GAME
                         difficulty_lvl = 2
+                        is_first_menu_load = True
                     if third_night_btn.update(event):
                         game_state = LOAD_GAME
                         difficulty_lvl = 3
+                        is_first_menu_load = True
                     if fourth_night_btn.update(event):
                         game_state = LOAD_GAME
                         difficulty_lvl = 4
+                        is_first_menu_load = True
                     if fifth_night_btn.update(event):
                         game_state = LOAD_GAME
                         difficulty_lvl = 5
+                        is_first_menu_load = True
 
         if game_state == LOAD_GAME:
-            main_scene.set_background(first_night_image)
+            if difficulty_lvl == 1:
+                main_scene.set_background(first_night_image)
+            if difficulty_lvl == 2:
+                main_scene.set_background(second_night_image)
+            if difficulty_lvl == 3:
+                main_scene.set_background(third_night_image)
+            if difficulty_lvl == 4:
+                main_scene.set_background(fourth_night_image)
+            if difficulty_lvl == 5:
+                main_scene.set_background(fifth_night_image)
 
             if not load_game_count_started:
                 pygame.time.set_timer(LOADEVENTTYPE, 2000, 1)
@@ -149,6 +179,7 @@ if __name__ == '__main__':
                 if event.type == LOADEVENTTYPE:
                     print('игра запущена')
                     game_state = GAME_MODE
+                    load_game_count_started = False
 
         if game_state == GAME_MODE:
             if is_first_run:
@@ -163,6 +194,8 @@ if __name__ == '__main__':
                 cam_buttons = pygame.sprite.Group()
                 for i in range(8):
                     cam_button = Button(screen, cam_icons[i], 0, 0)
+                    cam_buttons.add(cam_button)
+                jumpscares = pygame.sprite.Group
                 is_first_run = False
             main_scene.set_background(office_img)
             laptop.catch()
@@ -175,8 +208,8 @@ if __name__ == '__main__':
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == CHANGEROOMTYPE:
-                    puppet.change_room()
-                    print(puppet.room)
+                    if not puppet.is_attacking:
+                        puppet.change_room()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if laptop.update(event):
                         if not laptop.is_open:
@@ -184,13 +217,25 @@ if __name__ == '__main__':
                         else:
                             laptop.close()
 
-            if room == 0 or room == 10:
-                game_lost = True
-
-            if game_lost:
+            if puppet.is_attacking:
                 game_state = GAME_OVER
+                is_first_run = True
+
         if game_state == GAME_OVER:
-            main_scene.set_background(game_lost)
+            main_scene.set_background(game_over_image)
+            if is_first_lost_game:
+                pygame.time.set_timer(LOADEVENTTYPE, 3000, 1)
+                is_first_lost_game = False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == LOADEVENTTYPE:
+                    game_state = MAIN_MENU
+                    is_first_lost_game = True
 
         pygame.display.update()
     pygame.quit()
+
+
+if __name__ == '__main__':
+    main()
